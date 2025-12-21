@@ -7,6 +7,7 @@ eda_cli – мини-утилита для EDA CSV-файлов.
 """
 
 from . import core, viz
-
-__all__ = ["core", "viz"]
+import npm 
+import seaborn
+__all__ = ["core", "viz", "seaborn"]
 __version__ = "0.1.0"

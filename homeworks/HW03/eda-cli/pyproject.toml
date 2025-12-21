@@ -13,6 +13,8 @@ dependencies = [
     "pandas>=2.3.3",
     "pytest>=9.0.1",
     "typer>=0.20.0",
+    "seaborn>=0.13.2",
+    "npm>=0.1.1",
 ]
 
 [project.scripts]

@@ -1,228 +1,168 @@
-import pandas as pd
+from __future__ import annotations
+
 from pathlib import Path
+from typing import Dict, Iterable, List, Union
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+PathLike = Union[str, Path]
+
+
+def _ensure_dir(path: PathLike) -> Path:
+    p = Path(path)
+    p.mkdir(parents=True, exist_ok=True)
+    return p
+
+
+def plot_histograms_per_column(
+    df: pd.DataFrame,
+    out_dir: PathLike,
+    max_columns: int = 6,
+    bins: int = 20,
+) -> List[Path]:
+    """
+    Для числовых колонок строит по отдельной гистограмме.
+    Возвращает список путей к PNG.
+    """
+    out_dir = _ensure_dir(out_dir)
+    numeric_df = df.select_dtypes(include="number")
+
+    paths: List[Path] = []
+    for i, name in enumerate(numeric_df.columns[:max_columns]):
+        s = numeric_df[name].dropna()
+        if s.empty:
+            continue
+
+        fig, ax = plt.subplots()
+        ax.hist(s.values, bins=bins)
+        ax.set_title(f"Histogram of {name}")
+        ax.set_xlabel(name)
+        ax.set_ylabel("Count")
+        fig.tight_layout()
+
+        out_path = out_dir / f"hist_{i+1}_{name}.png"
+        fig.savefig(out_path)
+        plt.close(fig)
+
+        paths.append(out_path)
+
+    return paths
+
+
+def plot_missing_matrix(df: pd.DataFrame, out_path: PathLike) -> Path:
+    """
+    Простая визуализация пропусков: где True=пропуск, False=значение.
+    """
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if df.empty:
+        # Рисуем пустой график
+        fig, ax = plt.subplots()
+        ax.text(0.5, 0.5, "Empty dataset", ha="center", va="center")
+        ax.axis("off")
+    else:
+        mask = df.isna().values
+        fig, ax = plt.subplots(figsize=(min(12, df.shape[1] * 0.4), 4))
+        ax.imshow(mask, aspect="auto", interpolation="none")
+        ax.set_xlabel("Columns")
+        ax.set_ylabel("Rows")
+        ax.set_title("Missing values matrix")
+        ax.set_xticks(range(df.shape[1]))
+        ax.set_xticklabels(df.columns, rotation=90, fontsize=8)
+        ax.set_yticks([])
+
+    fig.tight_layout()
+    fig.savefig(out_path)
+    plt.close(fig)
+    return out_path
+
+
+def plot_correlation_heatmap(df: pd.DataFrame, out_path: PathLike) -> Path:
+    """
+    Тепловая карта корреляции числовых признаков.
+    """
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    numeric_df = df.select_dtypes(include="number")
+    if numeric_df.shape[1] < 2:
+        fig, ax = plt.subplots()
+        ax.text(0.5, 0.5, "Not enough numeric columns for correlation", ha="center", va="center")
+        ax.axis("off")
+    else:
+        corr = numeric_df.corr(numeric_only=True)
+        fig, ax = plt.subplots(figsize=(min(10, corr.shape[1]), min(8, corr.shape[0])))
+        im = ax.imshow(corr.values, vmin=-1, vmax=1, cmap="coolwarm", aspect="auto")
+        ax.set_xticks(range(corr.shape[1]))
+        ax.set_xticklabels(corr.columns, rotation=90, fontsize=8)
+        ax.set_yticks(range(corr.shape[0]))
+        ax.set_yticklabels(corr.index, fontsize=8)
+        ax.set_title("Correlation heatmap")
+        fig.colorbar(im, ax=ax, label="Pearson r")
+
+    fig.tight_layout()
+    fig.savefig(out_path)
+    plt.close(fig)
+    return out_path
+
+
+def save_top_categories_tables(
+    top_cats: Dict[str, pd.DataFrame],
+    out_dir: PathLike,
+) -> List[Path]:
+    """
+    Сохраняет top-k категорий по колонкам в отдельные CSV.
+    """
+    out_dir = _ensure_dir(out_dir)
+    paths: List[Path] = []
+    for name, table in top_cats.items():
+        out_path = out_dir / f"top_values_{name}.csv"
+        table.to_csv(out_path, index=False)
+        paths.append(out_path)
+    return paths
 import matplotlib.pyplot as plt
 import seaborn as sns
-from typing import Dict, Any, List
-import numpy as np
 
-def save_histograms(
-    df: pd.DataFrame, 
-    out_dir: Path, 
-    max_columns: int = 5
-) -> List[str]:
+def generate_histograms_section(df: pd.DataFrame, max_columns: int = 5) -> str:
     """
-    Сохраняет гистограммы для числовых колонок.
-    
-    Args:
-        max_columns: максимальное количество гистограмм для построения
+    Генерирует Markdown-раздел с гистограммами для числовых колонок.
     """
     numeric_cols = df.select_dtypes(include=['number']).columns.tolist()
-    saved_images = []
-    
+
+    if len(numeric_cols) == 0:
+        return "Нет числовых колонок для построения гистограмм.\n\n"
+
+    # Ограничиваем количество колонок
     cols_to_plot = numeric_cols[:max_columns]
-    
-    for i, col in enumerate(cols_to_plot):
-        plt.figure(figsize=(10, 6))
-        
-        data = df[col].dropna()
-        
-        if len(data) > 0:
-            plt.hist(data, bins=min(30, len(data)//10 + 1), edgecolor='black', alpha=0.7)
-            plt.title(f'Распределение: {col}')
-            plt.xlabel(col)
-            plt.ylabel('Частота')
-            
-            stats_text = f'n={len(data)}\nmean={data.mean():.2f}\nstd={data.std():.2f}'
-            plt.text(0.7, 0.7, stats_text, transform=plt.gca().transAxes,
-                    bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
-            
-            filename = out_dir / f'hist_{col.replace(" ", "_")}.png'
-            plt.tight_layout()
-            plt.savefig(filename, dpi=100)
-            plt.close()
-            
-            saved_images.append(filename.name)
-        else:
-            plt.close()
-    
-    if len(numeric_cols) > max_columns:
-        print(f"⚠️ Построено только {max_columns} из {len(numeric_cols)} числовых колонок.")
-        print(f"   Используйте --max-hist-columns для увеличения лимита.")
-    
-    return saved_images
 
-def create_report(
-    df: pd.DataFrame,
-    quality_flags: Dict[str, Any],
-    out_dir: Path,
-    title: str = "EDA Report",
-    max_hist_columns: int = 5,
-    top_k_categories: int = 10,
-    min_missing_share: float = 0.3,
-    high_cardinality_threshold: int = 50
-) -> None:
+    # Создаём изображения и сохраняем их (или используем base64, если нужно встраивать)
+    # Здесь просто текстовый пример — в реальном проекте нужно сохранять графики в файлы
+    section = "### Гистограммы числовых признаков\n"
+    for col in cols_to_plot:
+        section += f"#### {col}\n"
+        section += "*(График будет здесь)*\n\n"
+        # Можно добавить: ![](plots/hist_{col}.png)
+
+    return section
+
+
+def generate_category_tables_section(df: pd.DataFrame, top_k: int = 10) -> str:
     """
-    Создает полный отчет в формате Markdown.
+    Генерирует Markdown-раздел с таблицами частот для категориальных признаков.
     """
-    report_lines = []
-    
-    report_lines.append(f"# {title}")
-    report_lines.append(f"*Сгенерировано с помощью eda-cli*\n")
-    
-    report_lines.append("## ⚙️ Параметры анализа")
-    report_lines.append(f"- **Макс. гистограмм:** {max_hist_columns}")
-    report_lines.append(f"- **Топ-K категорий:** {top_k_categories}")
-    report_lines.append(f"- **Порог проблемных пропусков:** {min_missing_share:.0%}")
-    report_lines.append(f"- **Порог высокой кардинальности:** {high_cardinality_threshold}")
-    report_lines.append("")
-    report_lines.append("## 📊 Общая информация")
-    report_lines.append(f"- **Размер данных:** {quality_flags['n_rows']} строк × {quality_flags['n_cols']} колонок")
-    report_lines.append(f"- **Числовые колонки:** {quality_flags.get('numeric_columns_count', 0)}")
-    report_lines.append(f"- **Категориальные колонки:** {quality_flags.get('categorical_columns_count', 0)}")
-    report_lines.append(f"- **Колонки с датами:** {quality_flags.get('date_columns_count', 0)}")
-    report_lines.append("")
-    
+    cat_cols = df.select_dtypes(include=['object', 'category']).columns.tolist()
 
-    report_lines.append("## 🔍 Качество данных")
-    report_lines.append(f"- **Интегральный score:** `{quality_flags['quality_score']:.2f}/1.00`")
-    
-    missing_info = []
-    if quality_flags['problematic_missing_cols']:
-        for item in quality_flags['problematic_missing_cols'][:10]:
-            missing_info.append(f"  - `{item['column']}`: {item['missing_ratio']:.1%}")
-    
-    if missing_info:
-        report_lines.append(f"- **⚠️ Колонки с >{min_missing_share:.0%} пропусков:**")
-        report_lines.extend(missing_info)
-        if len(quality_flags['problematic_missing_cols']) > 10:
-            report_lines.append(f"  *... и еще {len(quality_flags['problematic_missing_cols']) - 10} колонок*")
-    else:
-        report_lines.append(f"- **✓ Нет колонок с >{min_missing_share:.0%} пропусков**")
-    report_lines.append("")
-    
-    if quality_flags['has_duplicates']:
-        report_lines.append(f"- **⚠️ Обнаружены дубликаты строк:** {quality_flags['duplicate_rows']}")
-    else:
-        report_lines.append("- **✓ Нет дубликатов строк**")
-    report_lines.append("")
-    
-    if quality_flags['has_constant_columns']:
-        report_lines.append(f"- **⚠️ Константные колонки:**")
-        for col in quality_flags['constant_columns_list']:
-            report_lines.append(f"  - `{col}`")
-    else:
-        report_lines.append("- **✓ Нет константных колонок**")
-    report_lines.append("")
-    
-    if quality_flags['has_high_cardinality_categoricals']:
-        report_lines.append(f"- **⚠️ Высокая кардинальность (> {high_cardinality_threshold} уникальных значений):**")
-        for col, count in quality_flags['high_cardinality_columns'].items():
-            report_lines.append(f"  - `{col}`: {count} уникальных значений")
-    else:
-        report_lines.append("- **✓ Нет категориальных признаков с высокой кардинальностью**")
-    report_lines.append("")
-    
-    if quality_flags['has_suspicious_id_duplicates']:
-        report_lines.append("- **⚠️ Возможные проблемы с уникальностью ID:**")
-        for col, count in quality_flags['suspicious_id_duplicates'].items():
-            report_lines.append(f"  - `{col}`: {count} дубликатов")
-    report_lines.append("")
-    
-    report_lines.append(f"## 📈 Топ-{top_k_categories} значений по категориальным признакам")
-    categorical_cols = df.select_dtypes(include=['object', 'category']).columns
-    
-    if len(categorical_cols) > 0:
-        for col in categorical_cols[:10]:
-            value_counts = df[col].value_counts()
-            total = len(df[col].dropna())
-            
-            if total > 0:
-                report_lines.append(f"### `{col}`")
-                report_lines.append(f"Всего значений: {total} | Уникальных: {value_counts.shape[0]}")
-                
-                top_values = value_counts.head(top_k_categories)
-                for value, count in top_values.items():
-                    percentage = count / total * 100
-                    report_lines.append(f"- `{value}`: {count} ({percentage:.1f}%)")
-                
-                if len(value_counts) > top_k_categories:
-                    other_count = value_counts.iloc[top_k_categories:].sum()
-                    other_pct = other_count / total * 100
-                    report_lines.append(f"- *... и еще {len(value_counts) - top_k_categories} значений: {other_count} ({other_pct:.1f}%)*")
-                
-                report_lines.append("")
-    else:
-        report_lines.append("Категориальные признаки отсутствуют.\n")
-    
-    report_lines.append(f"## 📊 Гистограммы числовых признаков")
-    report_lines.append(f"*Построено гистограмм: {max_hist_columns} из {quality_flags.get('numeric_columns_count', 0)} числовых колонок*")
-    
-    saved_images = save_histograms(df, out_dir, max_columns=max_hist_columns)
-    
-    if saved_images:
-        for img in saved_images:
-            report_lines.append(f"![{img}]({img})")
-        report_lines.append("")
-    else:
-        report_lines.append("Числовые признаки для гистограмм отсутствуют.\n")
-    
-    numeric_cols = df.select_dtypes(include=['number']).columns
-    if len(numeric_cols) > 0:
-        report_lines.append("## 📐 Статистика по числовым колонкам")
-        report_lines.append("| Колонка | Среднее | Медиана | Std | Min | Max |")
-        report_lines.append("|---------|---------|---------|-----|-----|-----|")
-        
-        for col in numeric_cols[:15]:
-            stats = df[col].describe()
-            report_lines.append(
-                f"| `{col}` | {stats.get('mean', 'NA'):.2f} | {stats.get('50%', 'NA'):.2f} | "
-                f"{stats.get('std', 'NA'):.2f} | {stats.get('min', 'NA'):.2f} | {stats.get('max', 'NA'):.2f} |"
-            )
-        
-        if len(numeric_cols) > 15:
-            report_lines.append(f"| *... и еще {len(numeric_cols) - 15} колонок* |")
-        report_lines.append("")
+    if len(cat_cols) == 0:
+        return "Нет категориальных колонок для анализа.\n\n"
 
-    report_lines.append("## 🎯 Выводы")
-    score = quality_flags['quality_score']
-    
-    if score > 0.8:
-        report_lines.append("✅ **Отличное качество данных.** Можно сразу переходить к моделированию.")
-    elif score > 0.6:
-        report_lines.append("⚠️ **Среднее качество данных.** Рекомендуется очистка данных.")
-    elif score > 0.4:
-        report_lines.append("⚠️ **Низкое качество данных.** Требуется значительная предобработка.")
-    else:
-        report_lines.append("❌ **Критическое качество данных.** Возможно, требуется поиск нового датасета.")
-    
-    report_lines.append("")
-    report_lines.append("---")
-    report_lines.append(f"*Отчет сгенерирован с параметрами: max_hist_columns={max_hist_columns}, "
-                       f"top_k_categories={top_k_categories}, min_missing_share={min_missing_share:.0%}*")
-    
-    report_path = out_dir / "report.md"
-    report_path.write_text("\n".join(report_lines), encoding="utf-8")
-    
-    import json
-    summary = {
-        "title": title,
-        "parameters": {
-            "max_hist_columns": max_hist_columns,
-            "top_k_categories": top_k_categories,
-            "min_missing_share": min_missing_share,
-            "high_cardinality_threshold": high_cardinality_threshold
-        },
-        "basic_metrics": {
-            "n_rows": quality_flags['n_rows'],
-            "n_cols": quality_flags['n_cols'],
-            "quality_score": quality_flags['quality_score']
-        },
-        "problematic_columns": {
-            "high_missing": [item['column'] for item in quality_flags['problematic_missing_cols']],
-            "constant": quality_flags['constant_columns_list'],
-            "high_cardinality": list(quality_flags['high_cardinality_columns'].keys())
-        }
-    }
-    
-    json_path = out_dir / "summary.json"
-    json_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
+    section = "### Топ-{top_k} значений в категориальных признаках\n"
+    for col in cat_cols:
+        value_counts = df[col].value_counts().head(top_k).reset_index()
+        value_counts.columns = ['Значение', 'Частота']
+        section += f"#### {col}\n"
+        section += value_counts.to_markdown(index=False) + "\n\n"
+
+    return section
