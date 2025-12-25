@@ -152,7 +152,7 @@ if __name__ == "__main__":
     app()
 
 import click
-from src.eda_cli import core, viz
+from src.eda_cli import core, viz 
 
 @click.command()
 @click.argument('input_file', type=click.Path(exists=True))
