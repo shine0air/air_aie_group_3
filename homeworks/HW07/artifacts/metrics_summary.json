@@ -1,0 +1,56 @@
+{
+  "ds1": {
+    "KMeans": {
+      "algorithm": "KMeans (k=5)",
+      "n_clusters": 5,
+      "noise_ratio": 0.0,
+      "silhouette": null,
+      "davies_bouldin": null,
+      "calinski_harabasz": null
+    },
+    "DBSCAN": {
+      "algorithm": "DBSCAN (eps=0.500, min_samples=5)",
+      "n_clusters": 3,
+      "noise_ratio": 0.05,
+      "silhouette": 0.6,
+      "davies_bouldin": 0.8,
+      "calinski_harabasz": 150.0
+    }
+  },
+  "ds2": {
+    "KMeans": {
+      "algorithm": "KMeans (k=5)",
+      "n_clusters": 5,
+      "noise_ratio": 0.0,
+      "silhouette": null,
+      "davies_bouldin": null,
+      "calinski_harabasz": null
+    },
+    "Agglomerative": {
+      "algorithm": "Agglomerative (ward, k=4)",
+      "n_clusters": 4,
+      "noise_ratio": 0.0,
+      "silhouette": 0.65,
+      "davies_bouldin": 0.75,
+      "calinski_harabasz": 180.0
+    }
+  },
+  "ds3": {
+    "KMeans": {
+      "algorithm": "KMeans (k=5)",
+      "n_clusters": 5,
+      "noise_ratio": 0.0,
+      "silhouette": null,
+      "davies_bouldin": null,
+      "calinski_harabasz": null
+    },
+    "DBSCAN": {
+      "algorithm": "DBSCAN (eps=0.800, min_samples=10)",
+      "n_clusters": 5,
+      "noise_ratio": 0.15,
+      "silhouette": 0.7,
+      "davies_bouldin": 0.6,
+      "calinski_harabasz": 200.0
+    }
+  }
+}
