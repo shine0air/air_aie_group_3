@@ -1,0 +1,40 @@
+{
+  "DecisionTree": {
+    "best_params": "{'criterion': 'gini', 'max_depth': 7, 'min_samples_leaf': 5, 'min_samples_split': 2}",
+    "best_cv_score": 0.9818965875509397,
+    "cv_results_keys": [
+      "mean_fit_time",
+      "std_fit_time",
+      "mean_score_time",
+      "std_score_time",
+      "param_criterion",
+      "param_max_depth",
+      "param_min_samples_leaf",
+      "param_min_samples_split",
+      "params",
+      "split0_test_score",
+      "split1_test_score",
+      "split2_test_score",
+      "split3_test_score",
+      "split4_test_score",
+      "mean_test_score",
+      "std_test_score",
+      "rank_test_score",
+      "split0_train_score",
+      "split1_train_score",
+      "split2_train_score",
+      "split3_train_score",
+      "split4_train_score",
+      "mean_train_score",
+      "std_train_score"
+    ]
+  },
+  "RandomForest": {
+    "best_params": "{'max_depth': None, 'max_features': 'sqrt', 'min_samples_leaf': 1, 'n_estimators': 50}",
+    "best_cv_score": 0.968799976986057
+  },
+  "GradientBoosting": {
+    "best_params": "{'learning_rate': 0.1, 'max_depth': 3, 'n_estimators': 100, 'subsample': 1.0}",
+    "best_cv_score": 0.9840579230703742
+  }
+}

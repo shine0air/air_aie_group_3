@@ -1,0 +1,7 @@
+{
+  "Dummy": 0.9532418800711483,
+  "Logistic Regression": 0.9548696433922685,
+  "Decision Tree": 0.9818965875509397,
+  "Random Forest": 0.968799976986057,
+  "Gradient Boosting": 0.9840579230703742
+}
