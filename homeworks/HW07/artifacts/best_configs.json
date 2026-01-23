@@ -1,20 +1,26 @@
 {
-  "01": {
-    "method": "KMeans",
+  "ds1": {
+    "method": "DBSCAN",
     "params": {
-      "n_clusters": 2
-    }
+      "eps": 0.2,
+      "min_samples": 15
+    },
+    "criterion": "silhouette"
   },
-  "02": {
-    "method": "KMeans",
+  "ds2": {
+    "method": "DBSCAN",
     "params": {
-      "n_clusters": 2
-    }
+      "eps": 0.1,
+      "min_samples": 10
+    },
+    "criterion": "silhouette"
   },
-  "03": {
-    "method": "KMeans",
+  "ds3": {
+    "method": "DBSCAN",
     "params": {
-      "n_clusters": 2
-    }
+      "eps": 0.1,
+      "min_samples": 10
+    },
+    "criterion": "silhouette"
   }
 }
