@@ -6,15 +6,17 @@
     }
   },
   "02": {
-    "method": "KMeans",
+    "method": "DBSCAN",
     "params": {
-      "n_clusters": 2
+      "eps": 0.1,
+      "min_samples": 10
     }
   },
   "03": {
-    "method": "KMeans",
+    "method": "DBSCAN",
     "params": {
-      "n_clusters": 2
+      "eps": 0.1,
+      "min_samples": 10
     }
   }
 }
