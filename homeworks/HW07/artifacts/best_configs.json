@@ -7,34 +7,20 @@
     },
     "criterion": "silhouette"
   },
-<<<<<<< HEAD
-  "02": {
-=======
   "ds2": {
->>>>>>> 9884cb448c30a673e62b7845a64701c609bdd28f
     "method": "DBSCAN",
     "params": {
       "eps": 0.1,
       "min_samples": 10
-<<<<<<< HEAD
-    }
-  },
-  "03": {
-=======
     },
     "criterion": "silhouette"
   },
   "ds3": {
->>>>>>> 9884cb448c30a673e62b7845a64701c609bdd28f
     "method": "DBSCAN",
     "params": {
       "eps": 0.1,
       "min_samples": 10
-<<<<<<< HEAD
-    }
-=======
     },
     "criterion": "silhouette"
->>>>>>> 9884cb448c30a673e62b7845a64701c609bdd28f
   }
 }
