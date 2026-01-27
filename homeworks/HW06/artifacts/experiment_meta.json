@@ -1,0 +1,51 @@
+{
+  "experiment_info": {
+    "task": "HW06 - \u0414\u0435\u0440\u0435\u0432\u044c\u044f \u0440\u0435\u0448\u0435\u043d\u0438\u0439 \u0438 \u0430\u043d\u0441\u0430\u043c\u0431\u043b\u0438",
+    "dataset_file": "S06-hw-dataset-02.csv",
+    "dataset_type": "binary",
+    "random_state": 42,
+    "test_size": 0.2,
+    "execution_date": "2026-01-27 23:36:36"
+  },
+  "model_selection": {
+    "best_model_by_cv": "RandomForest",
+    "best_cv_score": 0.9264578404100792,
+    "cv_results": {
+      "Dummy": 0.49440615484260525,
+      "LogisticRegression": 0.8041164350806509,
+      "DecisionTree": 0.827715778247212,
+      "RandomForest": 0.9264578404100792,
+      "HistGradientBoosting": 0.9248247877937125
+    }
+  },
+  "test_results": {
+    "best_model_on_test": "RandomForest",
+    "test_metrics": {
+      "Dummy": {
+        "accuracy": 0.6152777777777778,
+        "f1": 0.2660307366189719,
+        "roc_auc": 0.5026724060622366
+      },
+      "LogisticRegression": {
+        "accuracy": 0.8127777777777778,
+        "f1": 0.5623376623376624,
+        "roc_auc": 0.7976803276238305
+      },
+      "DecisionTree": {
+        "accuracy": 0.8180555555555555,
+        "f1": 0.6066066066066066,
+        "roc_auc": 0.8228210723502624
+      },
+      "RandomForest": {
+        "accuracy": 0.8930555555555556,
+        "f1": 0.7624922887106724,
+        "roc_auc": 0.9286585159278191
+      },
+      "HistGradientBoosting": {
+        "accuracy": 0.9,
+        "f1": 0.7892271662763466,
+        "roc_auc": 0.9223954005121613
+      }
+    }
+  }
+}
