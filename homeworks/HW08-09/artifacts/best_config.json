@@ -1,0 +1,19 @@
+{
+  "architecture": {
+    "hidden_sizes": [
+      256,
+      128,
+      64
+    ],
+    "num_classes": 47,
+    "dropout_p": 0.0,
+    "use_batchnorm": true
+  },
+  "optimizer": "Adam",
+  "lr": 0.001,
+  "seed": 42,
+  "dataset": "EMNIST_balanced",
+  "early_stopping": {
+    "patience": 5
+  }
+}
