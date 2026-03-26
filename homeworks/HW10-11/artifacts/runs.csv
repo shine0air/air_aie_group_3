@@ -1,0 +1,5 @@
+exp,model,aug,pretrained,fine_tune,val_accuracy
+C1,SimpleCNN,False,False,none,0.59
+C2,SimpleCNN,True,False,none,0.546
+C3,ResNet18,True,True,head_only,0.763
+C4,ResNet18,True,True,layer4+fc,0.856
