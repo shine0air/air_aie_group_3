@@ -32,6 +32,7 @@ eggs/
 *.egg-info/
 .installed.cfg
 data/
+data_seg/
 
 # Кеши и артефакты тестов
 .pytest_cache/

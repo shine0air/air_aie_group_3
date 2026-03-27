@@ -1,12 +1,11 @@
 {
-  "experiment": "C4",
-  "model": "ResNet18",
   "dataset": "STL10",
-  "num_classes": 10,
-  "batch_size": 64,
-  "epochs": 10,
+  "model": "ResNet18_pretrained",
+  "transform": "base",
+  "optimizer": "Adam",
+  "lr": 0.001,
+  "epochs": 5,
   "seed": 42,
-  "val_accuracy": 0.856,
-  "test_accuracy": 0.8595,
-  "device": "cpu"
+  "best_val_accuracy": 94.7,
+  "test_accuracy": 94.5375
 }
