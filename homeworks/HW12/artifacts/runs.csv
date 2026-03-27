@@ -1,0 +1,5 @@
+experiment_id,task,dataset,seed,split_summary,window_size,horizon,model_summary,features_summary,scaler,optimizer,lr,epochs_trained,best_val_mae,best_val_rmse,best_val_mape,test_mae,test_rmse,test_mape,notes
+B1,forecasting,S12-hw-dataset,42,70/15/15 temporal,,1,naive-last,none,none,,,,20.377461300309605,24.39686245878387,12.875910440939025,23.727476780185764,27.88985694814937,14.49909351930316,baseline
+B2,forecasting,S12-hw-dataset,42,70/15/15 temporal,7,1,moving-average,none,none,,,,14.68068111455108,17.614324769229246,9.838650648433072,15.831187527642628,19.055634064414942,9.977488930418547,baseline
+B3,forecasting,S12-hw-dataset,42,70/15/15 temporal,,1,Ridge(alpha=1.0),"lag_1,7,14; rolling_mean/std_7; calendar",StandardScaler,,,,6.509335581180638,7.90200157996765,4.345314321989775,6.790613598809758,8.286377601710063,4.3618428307258466,linear baseline
+R1,forecasting,S12-hw-dataset,42,70/15/15 temporal,24,1,GRU(64x2)+FC,raw target sequence,StandardScaler,Adam,0.001,50,5.9885887346861875,,,11.996440737836492,14.902244357093608,7.783255076132516,best model
